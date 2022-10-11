@@ -57,7 +57,7 @@ class Client:
 
         return User(json)
 
-    async def fetch_user_score(self, user: Union[str, int], /, type: str, limit: int = 1, include_fails: bool = False):
+    async def fetch_user_score(self, user: Union[str, int], /, type: str, limit: int = 1, include_fails: bool = False) -> list[Score]:
         """Fetches scores for a user based on a type and limit"""
 
         if type not in self.score_types:
@@ -80,8 +80,8 @@ class Client:
                 
         return beatmaps
 
-    async def fetch_user_beatmaps(self, /, user: int, type: str, limit: int) -> List | Beatmapset:
-        """Fetches beatmaps for a user based on a type and limit"""
+    async def fetch_user_beatmaps(self, /, user: int, type: str, limit: int) -> list[Beatmapset] | list[dict, Union[Beatmapset, BeatmapCompact]]:
+        """Fetches beatmaps for a user based on a type and limit""" 
         headers = await self._make_headers()
         params = {
             "limit": limit
@@ -110,7 +110,7 @@ class Client:
 
         return json
 
-    async def fetch_beatmap(self, beatmap: Union[str, int]): 
+    async def fetch_beatmap(self, beatmap: Union[str, int]) -> Beatmap: 
         """Fetches a beatmap"""
 
         headers = await self._make_headers()

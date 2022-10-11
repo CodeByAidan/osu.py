@@ -1,6 +1,6 @@
 from __future__ import annotations
 import datetime
-from typing import Dict
+from typing import Dict, Optional
 
 
 class User:
@@ -123,29 +123,41 @@ class Beatmapset:
         "track_id",
         "user_id",
         "video",
+        "json"
     )
 
     def __init__(self, data: dict):
+        self.json = data
         keys = {k: v for k, v in data.items() if k in self.__slots__}
         for k,v in keys.items():
             setattr(self, k, v)
             continue
         
-        self.data = data
+    
 
     def covers(self, cover: str) -> str:
-        if cover not in self.data['covers']:
-            covers = ', '.join(self.data['covers'])
+        if cover not in self.json['covers']:
+            covers = ', '.join(self.json['covers'])
             return f"Cover not in covers!\nChoose from {covers}"
 
-        cover_data = self.data['covers'][cover]
+        cover_data = self.json['covers'][cover]
         return cover_data
 
 class Score:
     def __init__(self, data: dict):
-        keys = {k: v for k, v in data.items()}
-        for k, v in keys.items():
-            setattr(self, k, v)
-            continue
+        self.accuracy: int = data['accuracy']
+        self.best_id: int = data['best_id']
+        self.created_at: str = data['created_at']
+        self.id: int = data['id']
+        self.max_combo: int = data['max_combo']
+        self.mode: str = data['mode']
+        self.mods: list[str] = data['mods']
+        self.passed: bool = data['passed']
+        self.perfect: bool = data['perfect']
+        self.pp: Optional[int] = data['pp'] or 0 
+        self.rank: str = data['rank']
+        self.replay: bool = data['replay']
+        self.statistics: dict = data['statistics']
+        self.user_id: int = data['user_id']
         self.beatmapset = Beatmapset(data['beatmapset'])
         self.beatmap = BeatmapCompact(data['beatmap'])
