@@ -1,4 +1,4 @@
-__title__ = 'osu.py'
+__title__ = 'osu'
 __authors__ = 'SawshaDev'
 __version__ = '1.0.0'
 __license__ = 'MIT'
