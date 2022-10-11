@@ -25,7 +25,7 @@ Quick Example
   import asyncio
   
   async def main():
-    client = osu.Client(client_secret="YourClientSecret", client_id=clientid)
+    client = osu.Client(client_secret="YourClientSecret", client_id=yourclientid)
     return await client.fetch_user("Sawsha")
 
   user = asyncio.run(main())
