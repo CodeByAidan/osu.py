@@ -29,6 +29,5 @@ Quick Example
     return await client.fetch_user("Sawsha")
 
   user = asyncio.run(main())
-  print(user)
   print(user.username)
   
