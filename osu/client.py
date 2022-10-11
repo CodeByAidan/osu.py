@@ -3,6 +3,15 @@ import aiohttp
 from typing import Union, List
 from .errors import *
 from .abc import *
+import logging
+
+logger = logging.getLogger(__name__)
+dt_fmt = '%Y-%m-%d %H:%M:%S'
+formatter = logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', dt_fmt, style='{')
+handler = logging.StreamHandler()
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.DEBUG)
 
 class Client:
     def __init__(self, *, client_id: int, client_secret: str):
@@ -16,11 +25,18 @@ class Client:
         self.score_types = ['best', 'firsts', 'recent']
 
     async def _request(self, method: str, url: str, **kwargs):
+        logger.debug(f"Got request to {url} with method: {method}")
         async with self.session.request(method, url,**kwargs) as resp:
             json = await resp.json()
-
+            logger.debug(f"Received {resp.content_type} ({resp.status})\n{json}")
+            
         return json
 
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *error_details):
+        await self.session.close()
 
     async def _get_token(self):
         data = {
