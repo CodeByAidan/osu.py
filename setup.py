@@ -9,7 +9,7 @@ path = Path(__file__).parent / "thino" / "__init__.py"
 version = re.search(r'\d[.]\d[.]\d',path.read_text()).group(0) #type: ignore
 
 packages = [
-    'thino'
+    'osu'
 ]
 
 
