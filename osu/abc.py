@@ -27,6 +27,8 @@ class TestUser(_BaseUser):
     def __init__(self, data: PartialUser):
         super().__init__(data)
         self.discord = data['discord']
+        self.pp = data['statistics']['pp']
+        
 
 class User:
     def __init__(self, data):

@@ -42,7 +42,7 @@ class Client:
             'scope':"public",
         }
         returned = await self._request("POST", self.TOKEN_URL, data=data)
-        if returned.status >= 400 <= 499:
+        if returned.status >= 400 <= 403:
             raise HTTPException("Unauthorized. Make sure your client_secret is right")
         return (await returned.json())['access_token']
 
@@ -57,7 +57,7 @@ class Client:
 
         return headers
 
-    async def fetch_user(self, user: Union[str, int]) -> User:
+    async def fetch_user(self, user: Union[str, int]):
         """Fetches a user using either an ID or Username"""
         headers = await self._make_headers()
 
@@ -68,8 +68,8 @@ class Client:
 
         if 'error' in json.keys() and json['error'] is None:
             raise NoUserFound("No user was found by that name!")
-
-        return User(json)
+        
+        return TestUser(json)
 
     async def fetch_user_score(self, user: Union[str, int], /, type: str, limit: int = 1, include_fails: bool = False) -> list[Score]:
         """Fetches scores for a user based on a type and limit"""
@@ -82,7 +82,7 @@ class Client:
 
         params = {
             "limit": limit,
-            "include_fails": f"{0 if include_fails is not True else 1}"
+            "include_fails": f"{0 if not include_fails else 1}"
         }
 
         json = await (await self._request("GET", self.API_URL+f"/users/{user}/scores/{type}", headers=headers, params=params)).json()
