@@ -25,12 +25,8 @@ class Client:
         self.score_types = ['best', 'firsts', 'recent']
 
     async def _request(self, method: str, url: str, **kwargs):
-        logger.debug(f"Got request to {url} with method: {method}")
-        async with self.session.request(method, url,**kwargs) as resp:
-            json = await resp.json()
-            logger.debug(f"Received {resp.content_type} ({resp.status})\n{json}")
-            
-        return json
+        resp = await self.session.request(method, url,**kwargs)
+        return resp
 
     async def __aenter__(self):
         return self
@@ -45,10 +41,12 @@ class Client:
             'grant_type':'client_credentials',
             'scope':"public",
         }
+        returned = await self._request("POST", self.TOKEN_URL, data=data)
+        if returned.status >= 400 <= 499:
+            raise HTTPException("Unauthorized. Make sure your client_secret is right")
+        return (await returned.json())['access_token']
 
-        async with self.session.post(self.TOKEN_URL,data=data) as response:
-            return (await response.json())['access_token']
-    
+
     async def _make_headers(self):
         authorization = await self._get_token()
         headers = {
@@ -66,7 +64,7 @@ class Client:
         params = {
             "limit":5
         }
-        json = await self._request("GET", url=self.API_URL+f"/users/{user}", headers=headers, params=params)
+        json = await (await self._request("GET", url=self.API_URL+f"/users/{user}", headers=headers, params=params)).json()
 
         if 'error' in json.keys() and json['error'] is None:
             raise NoUserFound("No user was found by that name!")
@@ -87,7 +85,7 @@ class Client:
             "include_fails": f"{0 if include_fails is not True else 1}"
         }
 
-        json = await self._request("GET", self.API_URL+f"/users/{user}/scores/{type}", headers=headers, params=params)
+        json = await (await self._request("GET", self.API_URL+f"/users/{user}/scores/{type}", headers=headers, params=params)).json()
 
         beatmaps = []
         
@@ -107,7 +105,7 @@ class Client:
             types = ', '.join(self.beatmap_types)
             raise ValueError(f"Beatmap type must be in {types}")
 
-        json = await self._request("GET", self.API_URL + f"/users/{user}/beatmapsets/{type}",headers=headers,params=params)
+        json = await (await self._request("GET", self.API_URL + f"/users/{user}/beatmapsets/{type}",headers=headers,params=params)).json()
     
         beatmaps = []
         
@@ -131,7 +129,7 @@ class Client:
 
         headers = await self._make_headers()
 
-        json = await self._request("GET", self.API_URL+f"/beatmaps/{beatmap}", headers=headers)
+        json = await (await self._request("GET", self.API_URL+f"/beatmaps/{beatmap}", headers=headers)).json()
 
         if 'error' in json.keys():
             raise NoBeatMapFound("No beatmap was found by that ID!")

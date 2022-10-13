@@ -13,3 +13,7 @@ class NoBeatMapFound(OsuBaseException):
 class WrongType(OsuBaseException):
     """Returned when an wrong type for a Score or Beatmap is found"""
     pass
+
+class HTTPException(Exception):
+    """Base level exceptions raised by errors related to HTTP requests."""
+    pass

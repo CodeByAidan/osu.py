@@ -1,18 +1,43 @@
 from __future__ import annotations
 import datetime
-from typing import Dict, Optional
+from typing import Dict, Optional, TYPE_CHECKING
 
+if  TYPE_CHECKING:
+    from .types.user import PartialUser
+
+
+class _BaseUser:
+    __slots__ = (
+        "username",
+        "id",
+        "is_bot",
+        "avatar_url"
+    )
+    def __init__(self, data: PartialUser):
+        self._update(data)
+
+    def _update(self, data: PartialUser):
+        self.username = data['username']
+        self.id = data['id']
+        self.is_bot = data['is_bot']
+        self.avatar_url = data['avatar_url']
+
+
+class TestUser(_BaseUser):
+    def __init__(self, data: PartialUser):
+        super().__init__(data)
+        self.discord = data['discord']
 
 class User:
     def __init__(self, data):
         self.data = data
-        self.username = data.get('username')
+        self.username = data['username']
         self.global_rank = data.get('statistics').get("global_rank") if data.get('statistics').get("global_rank") is not None else 0
         self.pp = data.get("statistics").get("pp")  if data.get('statistics') else "None"
-        self.rank = data.get("statistics").get("grade_counts") if data.get('statistics') else "None"
+        self._rank = data.get("statistics").get("grade_counts") if data.get('statistics') else "None"
         self.accuracy = f"{data.get('statistics').get('hit_accuracy'):,.2f}"  if data.get('statistics') else "None"
         self.country_rank = data.get('statistics').get("country_rank") if data.get('statistics').get("country_rank") is not None else 0
-        self.profile_order = data['profile_order'] if data['profile_order'] else "Cant Get Profile Order!"
+        self._profile_order = data['profile_order'] if data['profile_order'] else "Cant Get Profile Order!"
         self.country_emoji = f":flag_{data.get('country_code').lower()}:" if data.get("country_code") else "None"
         self.country_code = data.get("country_code") if data.get("country_code") else "None"
         self._country = data.get("country")
@@ -32,20 +57,6 @@ class User:
 
     def __str__(self) -> str:
         return self.username
-
-
-    @property
-    def joined_at(self) -> str:
-        if self.data.get("join_date"):
-           return datetime.datetime.strptime(self.data.get('join_date'), '%Y-%m-%dT%H:%M:%S+00:00')
-
-    @property
-    def country(self):
-        return [self._country['code'], self._country['name']]
-
-    @property
-    def raw(self) -> Dict[str, any]:
-        return self.data
 
 class Beatmap:
     def __init__(self, data):
