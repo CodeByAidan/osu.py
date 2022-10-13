@@ -57,7 +57,7 @@ class Client:
 
         return headers
 
-    async def fetch_user(self, user: Union[str, int]):
+    async def fetch_user(self, user: Union[str, int]) -> User:
         """Fetches a user using either an ID or Username"""
         headers = await self._make_headers()
 
@@ -69,7 +69,7 @@ class Client:
         if 'error' in json.keys() and json['error'] is None:
             raise NoUserFound("No user was found by that name!")
         
-        return TestUser(json)
+        return User(json)
 
     async def fetch_user_score(self, user: Union[str, int], /, type: str, limit: int = 1, include_fails: bool = False) -> list[Score]:
         """Fetches scores for a user based on a type and limit"""
