@@ -41,7 +41,7 @@ class Client:
 
     async def fetch_user_score(self, user: Union[str, int], /, type: str, limit: int = 1, include_fails: bool = False) -> list[Score]:
         """Fetches scores for a user based on a type and limit"""
-
+    
         if type not in self.score_types:
             types = ', '.join(self.score_types)
             raise ValueError(f"Score type must be in {types}")
@@ -51,7 +51,7 @@ class Client:
             "include_fails": f"{0 if not include_fails else 1}"
         }
 
-        json = await self.http.get_user_scores(user, params)
+        json = await self.http.get_user_scores(user, type,params)
         beatmaps = []
         
         for beatmap in json:
@@ -69,7 +69,7 @@ class Client:
             types = ', '.join(self.beatmap_types)
             raise ValueError(f"Beatmap type must be in {types}")
 
-        json = await self.http.get_user_beatmaps(user, params)
+        json = await self.http.get_user_beatmaps(user, type,params)
     
         beatmaps = []
         
