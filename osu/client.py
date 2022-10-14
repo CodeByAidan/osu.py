@@ -3,6 +3,7 @@ import aiohttp
 from typing import Union, List
 from .errors import *
 from .abc import *
+from .http import HTTPClient
 import logging
 
 logger = logging.getLogger(__name__)
@@ -17,59 +18,26 @@ class Client:
     def __init__(self, *, client_id: int, client_secret: str):
         self.id = client_id
         self.secret = client_secret
-        self.session: aiohttp.ClientSession = aiohttp.ClientSession()
-        self.API_URL = "https://osu.ppy.sh/api/v2"
-        self.TOKEN_URL = "https://osu.ppy.sh/oauth/token"
         self.beatmap_types = ['favourite', 'graveyard', 'loved', 'most_played', 'pending', 'ranked']
         self.special_types = ['most_played']
         self.score_types = ['best', 'firsts', 'recent']
+        self.http: HTTPClient = HTTPClient(client_id=client_id, client_secret=client_secret)
 
-    async def _request(self, method: str, url: str, **kwargs):
-        resp = await self.session.request(method, url,**kwargs)
-        return resp
 
     async def __aenter__(self):
         return self
 
     async def __aexit__(self, *error_details):
-        await self.session.close()
+        await self.http.close()
 
-    async def _get_token(self):
-        data = {
-            "client_id": self.id,
-            "client_secret": self.secret,
-            'grant_type':'client_credentials',
-            'scope':"public",
-        }
-        returned = await self._request("POST", self.TOKEN_URL, data=data)
-        if returned.status >= 400 <= 403:
-            raise HTTPException("Unauthorized. Make sure your client_secret is right")
-        return (await returned.json())['access_token']
-
-
-    async def _make_headers(self):
-        authorization = await self._get_token()
-        headers = {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "Authorization": f"Bearer {authorization}"
-        }
-
-        return headers
 
     async def fetch_user(self, user: Union[str, int]) -> User:
         """Fetches a user using either an ID or Username"""
-        headers = await self._make_headers()
-
-        params = {
-            "limit":5
-        }
-        json = await (await self._request("GET", url=self.API_URL+f"/users/{user}", headers=headers, params=params)).json()
-
-        if 'error' in json.keys() and json['error'] is None:
+        user = await self.http.get_user(user)
+        if 'error' in user.keys() and user['error'] is None:
             raise NoUserFound("No user was found by that name!")
         
-        return User(json)
+        return User(user)
 
     async def fetch_user_score(self, user: Union[str, int], /, type: str, limit: int = 1, include_fails: bool = False) -> list[Score]:
         """Fetches scores for a user based on a type and limit"""
