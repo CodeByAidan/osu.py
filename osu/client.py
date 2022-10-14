@@ -31,15 +31,17 @@ class Client:
         await self.http.close()
 
 
-    async def fetch_user(self, user: Union[str, int]) -> User:
+    async def fetch_user(self, user: Union[str, int], *, key: Optional[str] = None) -> User:
         """Fetches a user using either an ID or Username"""
-        user = await self.http.get_user(user)
+        if key not in ['id', 'username'] or key is None:
+            raise ValueError(f"Key must be types: 'username' or 'id'! Not {key.__class__.__name__}!")
+
+        user = await self.http.get_user(user, key)
         if 'error' in user.keys() and user['error'] is None:
             raise NoUserFound("No user was found by that name!")
-        
         return User(user)
 
-    async def fetch_user_score(self, user: Union[str, int], /, type: str, limit: int = 1, include_fails: bool = False) -> list[Score]:
+    async def fetch_user_score(self, user: int, /, type: str, limit: int = 1, include_fails: bool = False) -> list[Score]:
         """Fetches scores for a user based on a type and limit"""
     
         if type not in self.score_types:

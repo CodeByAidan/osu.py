@@ -53,6 +53,7 @@ class User:
         self.total_hits = data.get("statistics").get("total_hits")
         self.total_score = data.get("statistics").get("total_score")
         self.play_count = data.get("statistics").get("play_count")
+        self.replays_watched_count = data['replays_watched_counts']
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__} username: {self.username!r}, id: {self.id}>"
@@ -73,6 +74,7 @@ class User:
     @property
     def raw(self) -> Dict[str, any]:
         return self.data
+
 
 class Beatmap:
     def __init__(self, data):

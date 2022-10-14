@@ -1,7 +1,9 @@
 import aiohttp
+
+from osu.abc import User
 from .errors import *
 from .types.user import PartialUser
-from typing import Union
+from typing import List, Union
 
 class HTTPClient:
     def __init__(self, *, client_id: int, client_secret: str):
@@ -41,9 +43,9 @@ class HTTPClient:
 
         return headers
 
-    async def get_user(self, user: Union[str, int]) -> PartialUser:
+    async def get_user(self, user: Union[str, int], key) -> PartialUser:
         headers = await self._make_headers()
-        return await (await self._request("GET", self.API_URL + f"/users/{user}", headers=headers)).json()
+        return await (await self._request("GET", self.API_URL + f"/users/{user}", headers=headers, params={"key": key})).json()
 
     async def get_beatmap(self, beatmap: Union[str, int]):
         headers = await self._make_headers()
