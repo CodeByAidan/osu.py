@@ -44,5 +44,15 @@ class HTTPClient:
     async def get_user(self, user: Union[str, int]) -> PartialUser:
         headers = await self._make_headers()
         return await (await self._request("GET", self.API_URL + f"/users/{user}", headers=headers)).json()
-        
 
+    async def get_beatmap(self, beatmap: Union[str, int]):
+        headers = await self._make_headers()
+        return await (await self._request("GET", self.API_URL+f"/beatmaps/{beatmap}", headers=headers)).json()
+        
+    async def get_user_beatmaps(self, /, user: int, params):
+        headers = await self._make_headers()
+        return await (await self._request("GET", self.API_URL + f"/users/{user}/beatmapsets/{type}",headers=headers,params=params)).json()
+
+    async def get_user_scores(self, /, user: int, params):
+        headers = await self._make_headers()
+        return await (await self._request("GET", self.API_URL + f"/users/{user}/scores/{type}",headers=headers,params=params)).json()

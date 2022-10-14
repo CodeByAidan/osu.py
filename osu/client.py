@@ -46,15 +46,12 @@ class Client:
             types = ', '.join(self.score_types)
             raise ValueError(f"Score type must be in {types}")
 
-        headers = await self._make_headers()
-
         params = {
             "limit": limit,
             "include_fails": f"{0 if not include_fails else 1}"
         }
 
-        json = await (await self._request("GET", self.API_URL+f"/users/{user}/scores/{type}", headers=headers, params=params)).json()
-
+        json = await self.http.get_user_scores(user, params)
         beatmaps = []
         
         for beatmap in json:
@@ -64,7 +61,6 @@ class Client:
 
     async def fetch_user_beatmaps(self, /, user: int, type: str, limit: int) -> list[Beatmapset] | list[dict, Union[Beatmapset, BeatmapCompact]]:
         """Fetches beatmaps for a user based on a type and limit""" 
-        headers = await self._make_headers()
         params = {
             "limit": limit
         }
@@ -73,7 +69,7 @@ class Client:
             types = ', '.join(self.beatmap_types)
             raise ValueError(f"Beatmap type must be in {types}")
 
-        json = await (await self._request("GET", self.API_URL + f"/users/{user}/beatmapsets/{type}",headers=headers,params=params)).json()
+        json = await self.http.get_user_beatmaps(user, params)
     
         beatmaps = []
         
@@ -94,15 +90,9 @@ class Client:
 
     async def fetch_beatmap(self, beatmap: Union[str, int]) -> Beatmap: 
         """Fetches a beatmap"""
-
-        headers = await self._make_headers()
-
-        json = await (await self._request("GET", self.API_URL+f"/beatmaps/{beatmap}", headers=headers)).json()
+        json = await self.http.get_beatmap(beatmap)
 
         if 'error' in json.keys():
             raise NoBeatMapFound("No beatmap was found by that ID!")
 
         return Beatmap(json)
-
-    async def close(self):
-        await self.session.close()
