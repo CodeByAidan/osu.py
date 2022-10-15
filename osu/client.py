@@ -87,7 +87,7 @@ class Client:
     
     async def _tests(self, method: str, /, endpoint: str, params: dict = None):
         headers = await self.http._make_headers()
-        async with self.http._session.request(method, self.API_URL + endpoint, params=params, headers=headers) as resp:
+        async with self.http._session.request(method, self.http.API_URL + endpoint, params=params, headers=headers) as resp:
             json = await resp.json()
 
         return json
