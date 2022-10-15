@@ -30,6 +30,8 @@ class Client:
     async def __aexit__(self, *error_details):
         await self.http.close()
 
+    async def close(self):
+        await self.http.close()
 
     async def fetch_user(self, user: Union[str, int], *, key: Optional[str] = None) -> User:
         """Fetches a user using either an ID or Username"""
@@ -38,7 +40,7 @@ class Client:
 
         user = await self.http.get_user(user, key)
         if 'error' in user.keys() and user['error'] is None:
-            raise NoUserFound("No user was found by that name!")
+            raise NoUserFound("No user was found by that name or id!")
         return User(user)
 
     async def fetch_user_score(self, user: int, /, type: str, limit: int = 1, include_fails: bool = False) -> list[Score]:
@@ -84,8 +86,8 @@ class Client:
         return beatmaps
     
     async def _tests(self, method: str, /, endpoint: str, params: dict = None):
-        headers = await self._make_headers()
-        async with self.session.request(method, self.API_URL + endpoint, params=params, headers=headers) as resp:
+        headers = await self.http._make_headers()
+        async with self.http._session.request(method, self.API_URL + endpoint, params=params, headers=headers) as resp:
             json = await resp.json()
 
         return json
@@ -94,7 +96,7 @@ class Client:
         """Fetches a beatmap"""
         json = await self.http.get_beatmap(beatmap)
 
-        if 'error' in json.keys():
+        if 'error' in json.keys() and json['error'] is None:
             raise NoBeatMapFound("No beatmap was found by that ID!")
 
         return Beatmap(json)
