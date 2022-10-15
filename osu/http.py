@@ -43,7 +43,7 @@ class HTTPClient:
 
         return headers
 
-    async def get_user(self, user: Union[str, int], key) -> PartialUser:
+    async def get_user(self, user: Union[str, int]) -> PartialUser:
         headers = await self._make_headers()
         return await (await self._request("GET", self.API_URL + f"/users/{user}", headers=headers)).json()
 
