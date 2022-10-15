@@ -35,10 +35,8 @@ class Client:
 
     async def fetch_user(self, user: Union[str, int], *, key: Optional[str] = None) -> User:
         """Fetches a user using either an ID or Username"""
-        if key not in ['id', 'username'] or key is None:
-            raise ValueError(f"Key must be types: 'username' or 'id'! Not {key.__class__.__name__}!")
 
-        user = await self.http.get_user(user, key)
+        user = await self.http.get_user(user)
         if 'error' in user.keys() and user['error'] is None:
             raise NoUserFound("No user was found by that name or id!")
         return User(user)
