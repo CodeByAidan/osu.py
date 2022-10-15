@@ -33,7 +33,7 @@ class Client:
     async def close(self):
         await self.http.close()
 
-    async def fetch_user(self, user: Union[str, int], *, key: Optional[str] = None) -> User:
+    async def fetch_user(self, user: Union[str, int]) -> User:
         """Fetches a user using either an ID or Username"""
 
         user = await self.http.get_user(user)
