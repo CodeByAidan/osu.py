@@ -6,7 +6,8 @@ with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
 path = Path(__file__).parent / "osu" / "__init__.py"
-version = re.search(r'\d[.]\d[.]\d',path.read_text())[0]
+
+version = re.search(r'\d[.]\d[.]\d',path.read_text())[0] #type: ignore
 
 packages = [
     'osu',
