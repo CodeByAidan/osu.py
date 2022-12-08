@@ -1,6 +1,6 @@
 import aiohttp
 
-from osu.abc import User
+from osu.abc_1 import User
 from .errors import *
 from .types.user import PartialUser
 from typing import List, Union
