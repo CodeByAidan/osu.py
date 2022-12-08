@@ -39,13 +39,13 @@ class User:
         self.rank = data.get("statistics").get("grade_counts") if data.get('statistics') else "None"
         self.accuracy = f"{data.get('statistics').get('hit_accuracy'):,.2f}"  if data.get('statistics') else "None"
         self.country_rank = data.get('statistics').get("country_rank") if data.get('statistics').get("country_rank") is not None else 0
-        self.profile_order = data['profile_order'] if data['profile_order'] else "Cant Get Profile Order!"
+        self.profile_order = data['profile_order'] or "Cant Get Profile Order!"
         self.country_emoji = f":flag_{data.get('country_code').lower()}:" if data.get("country_code") else "None"
-        self.country_code = data.get("country_code") if data.get("country_code") else "None"
+        self.country_code = data.get("country_code") or "None"
         self._country = data.get("country")
         self.avatar_url = data.get("avatar_url")
         self.id = data.get("id")
-        self.playstyle = data.get("playstyle") 
+        self.playstyle = data.get("playstyle")
         self.playmode = data.get("playmode")
         self.max_combo = data.get("statistics").get("maximum_combo")
         self.level = data.get("statistics").get("level")
@@ -110,8 +110,7 @@ class Beatmap:
         if cover not in self.data['beatmapset']['covers']:
             return "Cover not in covers"
 
-        cover_data = self.data['beatmapset']['covers'][cover]
-        return cover_data
+        return self.data['beatmapset']['covers'][cover]
 
 class BeatmapCompact:
     __slots__ = (
@@ -169,8 +168,7 @@ class Beatmapset:
             covers = ', '.join(self.json['covers'])
             return f"Cover not in covers!\nChoose from {covers}"
 
-        cover_data = self.json['covers'][cover]
-        return cover_data
+        return self.json['covers'][cover]
 
 class Score:
     def __init__(self, data: dict):
